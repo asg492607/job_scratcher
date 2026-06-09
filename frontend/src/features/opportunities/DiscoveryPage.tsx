@@ -5,7 +5,15 @@ import { OpportunityFilters } from '../../components/filters/OpportunityFilters'
 import { motion } from 'framer-motion';
 
 export const DiscoveryPage: React.FC = () => {
-  const { opportunities, isLoading, error, loadOpportunities } = useOpportunityStore();
+  const {
+    opportunities,
+    isLoading,
+    isScraping,
+    error,
+    scrapeMessage,
+    loadOpportunities,
+    scrapeAndReload,
+  } = useOpportunityStore();
 
   useEffect(() => {
     loadOpportunities();
@@ -14,9 +22,22 @@ export const DiscoveryPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Design Opportunities</h1>
-          <p className="mt-2 text-sm text-slate-600">Discover internships, jobs, and hackathons tailored for designers.</p>
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Design Opportunities</h1>
+            <p className="mt-2 text-sm text-slate-600">Discover internships, jobs, and hackathons tailored for designers.</p>
+            {scrapeMessage && (
+              <p className="mt-2 text-sm font-medium text-emerald-700">{scrapeMessage}</p>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={scrapeAndReload}
+            disabled={isScraping}
+            className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-300"
+          >
+            {isScraping ? 'Scraping jobs...' : 'Scrape latest jobs'}
+          </button>
         </div>
 
         <div className="flex flex-col md:flex-row gap-8">

@@ -53,6 +53,7 @@ export const OpportunityFilters: React.FC = () => {
               <option value="hackathon">Hackathons</option>
               <option value="fellowship">Fellowships</option>
               <option value="competition">Competitions</option>
+              <option value="freelance">Freelance</option>
             </select>
           </div>
 
@@ -78,11 +79,12 @@ export const OpportunityFilters: React.FC = () => {
               className="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-white"
             >
               <option value="">All Domains</option>
-              <option value="ui_ux">UI/UX Design</option>
+              <option value="ux_ui">UI/UX Design</option>
               <option value="product_design">Product Design</option>
               <option value="graphic_design">Graphic Design</option>
               <option value="motion_graphics">Motion Graphics</option>
               <option value="industrial_design">Industrial Design</option>
+              <option value="architecture">Architecture</option>
               <option value="other">Other</option>
             </select>
           </div>

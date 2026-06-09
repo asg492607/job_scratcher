@@ -24,7 +24,12 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({ opportunity })
               </Link>
             </h3>
             <p className="text-sm text-slate-600 font-medium">
-              {opportunity.company} &bull; <span className="text-slate-500">{opportunity.location}</span>
+              {opportunity.company || 'Unknown company'}
+              {opportunity.location && (
+                <>
+                  {' '}&bull; <span className="text-slate-500">{opportunity.location}</span>
+                </>
+              )}
             </p>
           </div>
           <div className="flex flex-col items-end space-y-2">
@@ -37,12 +42,16 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({ opportunity })
         </div>
 
         <div className="flex flex-wrap gap-2 mb-4">
-          <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-700 capitalize">
-            {opportunity.category}
-          </span>
-          <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-700 capitalize">
-            {opportunity.remote_status}
-          </span>
+          {opportunity.category && (
+            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-700 capitalize">
+              {opportunity.category}
+            </span>
+          )}
+          {opportunity.remote_status && (
+            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-700 capitalize">
+              {opportunity.remote_status}
+            </span>
+          )}
           {(opportunity.salary || opportunity.stipend) && (
             <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-green-50 text-green-700">
               {opportunity.salary || opportunity.stipend}

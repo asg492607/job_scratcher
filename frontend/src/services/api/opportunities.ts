@@ -40,3 +40,27 @@ export const fetchOpportunityById = async (id: string): Promise<Opportunity> => 
     throw error;
   }
 };
+
+export interface ScrapeResult {
+  created: number;
+  updated: number;
+  results?: Array<{
+    source: string;
+    fetched: number;
+    created: number;
+    updated: number;
+    error?: string;
+  }>;
+}
+
+export const scrapeOpportunities = async (): Promise<ScrapeResult> => {
+  const response = await fetch(`${API_BASE_URL}/opportunities/scrape`, {
+    method: 'POST',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to scrape opportunities');
+  }
+
+  return response.json();
+};

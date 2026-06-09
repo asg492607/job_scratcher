@@ -7,8 +7,38 @@ class OpportunityRepository:
     def __init__(self, db_session: Session):
         self.db = db_session
 
-    def get_all(self, skip: int = 0, limit: int = 100):
-        return self.db.query(Opportunity).offset(skip).limit(limit).all()
+    def get_all(
+        self,
+        skip: int = 0,
+        limit: int = 100,
+        search: str | None = None,
+        category: list[str] | None = None,
+        remote_status: list[str] | None = None,
+        domain: list[str] | None = None,
+        difficulty: list[str] | None = None,
+        portfolio_required: bool | None = None,
+    ):
+        query = self.db.query(Opportunity)
+
+        if search:
+            search_term = f"%{search}%"
+            query = query.filter(
+                Opportunity.title.ilike(search_term)
+                | Opportunity.company.ilike(search_term)
+                | Opportunity.description.ilike(search_term)
+            )
+        if category:
+            query = query.filter(Opportunity.category.in_(category))
+        if remote_status:
+            query = query.filter(Opportunity.remote_status.in_(remote_status))
+        if domain:
+            query = query.filter(Opportunity.domain.in_(domain))
+        if difficulty:
+            query = query.filter(Opportunity.difficulty.in_(difficulty))
+        if portfolio_required is not None:
+            query = query.filter(Opportunity.portfolio_required == portfolio_required)
+
+        return query.order_by(Opportunity.created_at.desc()).offset(skip).limit(limit).all()
 
     def get_by_id(self, opp_id: str):
         return self.db.query(Opportunity).filter(Opportunity.id == opp_id).first()

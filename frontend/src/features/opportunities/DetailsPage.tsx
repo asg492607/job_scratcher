@@ -68,12 +68,16 @@ export const DetailsPage: React.FC = () => {
             <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-6">
               <div>
                 <div className="flex flex-wrap gap-2 mb-4">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 capitalize">
-                    {opportunity.category}
-                  </span>
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700 capitalize">
-                    {opportunity.domain.replace('_', ' ')}
-                  </span>
+                  {opportunity.category && (
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 capitalize">
+                      {opportunity.category}
+                    </span>
+                  )}
+                  {opportunity.domain && (
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700 capitalize">
+                      {opportunity.domain.replace('_', ' ')}
+                    </span>
+                  )}
                   {opportunity.remote_status && (
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700 capitalize">
                       {opportunity.remote_status}

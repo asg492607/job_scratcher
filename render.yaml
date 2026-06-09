@@ -28,7 +28,7 @@ services:
     staticPublishPath: "./frontend/dist"
     envVars:
       - key: VITE_API_URL
-        value: https://opportunity-backend.onrender.com
+        value: https://opportunity-backend.onrender.com/api/v1
     routes:
       - type: rewrite
         source: /*

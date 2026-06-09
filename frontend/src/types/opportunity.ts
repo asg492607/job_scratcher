@@ -1,8 +1,8 @@
 export type RemoteStatus = 'remote' | 'hybrid' | 'onsite';
 
-export type Category = 'internship' | 'job' | 'hackathon' | 'fellowship' | 'competition';
+export type Category = 'internship' | 'job' | 'hackathon' | 'fellowship' | 'competition' | 'freelance';
 
-export type Domain = 'ui_ux' | 'graphic_design' | 'product_design' | 'motion_graphics' | 'industrial_design' | 'other';
+export type Domain = 'ux_ui' | 'graphic_design' | 'product_design' | 'motion_graphics' | 'industrial_design' | 'architecture' | 'other';
 
 export type Difficulty = 'beginner' | 'intermediate' | 'advanced';
 
@@ -17,16 +17,16 @@ export interface Opportunity {
   company: string;
   description: string;
   location: string;
-  remote_status: RemoteStatus;
+  remote_status?: RemoteStatus;
   salary?: string;
   stipend?: string;
   experience_level?: string;
   deadline?: string;
   source: string;
   apply_url: string;
-  category: Category;
-  domain: Domain;
-  difficulty: Difficulty;
+  category?: Category;
+  domain?: Domain;
+  difficulty?: Difficulty;
   industry?: string;
   quality_score?: number;
   growth_potential?: string;

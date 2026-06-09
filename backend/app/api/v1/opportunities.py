@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 
 from app.database.session import get_db
 from app.schemas.opportunity import OpportunityResponse, OpportunityCreate, OpportunityUpdate
@@ -16,8 +16,27 @@ def get_scraping_service(db: Session = Depends(get_db)):
     return ScrapingService(db)
 
 @router.get("/", response_model=List[OpportunityResponse])
-def get_opportunities(skip: int = 0, limit: int = 100, repo: OpportunityRepository = Depends(get_repo)):
-    return repo.get_all(skip=skip, limit=limit)
+def get_opportunities(
+    skip: int = 0,
+    limit: int = 100,
+    search: Optional[str] = None,
+    category: Optional[List[str]] = None,
+    remote_status: Optional[List[str]] = None,
+    domain: Optional[List[str]] = None,
+    difficulty: Optional[List[str]] = None,
+    portfolio_required: Optional[bool] = None,
+    repo: OpportunityRepository = Depends(get_repo),
+):
+    return repo.get_all(
+        skip=skip,
+        limit=limit,
+        search=search,
+        category=category,
+        remote_status=remote_status,
+        domain=domain,
+        difficulty=difficulty,
+        portfolio_required=portfolio_required,
+    )
 
 @router.post("/scrape")
 def scrape_opportunities(service: ScrapingService = Depends(get_scraping_service)):
