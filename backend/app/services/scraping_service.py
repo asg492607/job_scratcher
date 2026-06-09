@@ -8,6 +8,7 @@ from app.schemas.opportunity import OpportunityCreate
 from app.scrapers.arbeitnow import ArbeitnowScraper
 from app.scrapers.behance import BehanceScraper
 from app.scrapers.remotive import RemotiveScraper
+from app.scrapers.the_muse import TheMuseScraper
 
 
 class ScrapingService:
@@ -17,6 +18,7 @@ class ScrapingService:
         self.scrapers = {
             "remotive": RemotiveScraper(),
             "arbeitnow": ArbeitnowScraper(),
+            "the_muse": TheMuseScraper(),
             "behance": BehanceScraper(),
         }
 

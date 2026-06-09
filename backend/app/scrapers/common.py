@@ -1,7 +1,11 @@
+import os
+import time
 from datetime import datetime
 from typing import Any, Dict, List
 
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 
 DESIGN_KEYWORDS = (
@@ -26,9 +30,22 @@ DESIGN_KEYWORDS = (
 
 class ResilientScraperMixin:
     timeout = 20
+    polite_delay_seconds = 1
 
     def build_session(self) -> requests.Session:
         session = requests.Session()
+        retry = Retry(
+            total=3,
+            connect=3,
+            read=3,
+            backoff_factor=1,
+            status_forcelist=(429, 500, 502, 503, 504),
+            allowed_methods=("GET",),
+            raise_on_status=False,
+        )
+        adapter = HTTPAdapter(max_retries=retry)
+        session.mount("http://", adapter)
+        session.mount("https://", adapter)
         session.headers.update(
             {
                 "User-Agent": (
@@ -42,14 +59,33 @@ class ResilientScraperMixin:
         return session
 
     def get_json(self, url: str) -> Any:
+        time.sleep(self.polite_delay_seconds)
         response = self.session.get(url, timeout=self.timeout)
         response.raise_for_status()
         return response.json()
 
     def get_html(self, url: str) -> str:
+        time.sleep(self.polite_delay_seconds)
         response = self.session.get(url, timeout=self.timeout)
         response.raise_for_status()
         return response.text
+
+    def get_rendered_html(self, url: str, wait_until: str = "networkidle") -> str:
+        if os.getenv("ENABLE_BROWSER_SCRAPING", "true").lower() != "true":
+            return self.get_html(url)
+
+        from playwright.sync_api import sync_playwright
+
+        with sync_playwright() as playwright:
+            browser = playwright.chromium.launch(headless=True)
+            page = browser.new_page(
+                user_agent=self.session.headers.get("User-Agent"),
+                locale="en-US",
+            )
+            page.goto(url, wait_until=wait_until, timeout=self.timeout * 1000)
+            html = page.content()
+            browser.close()
+            return html
 
 
 def is_design_related(raw_data: Dict[str, Any]) -> bool:

@@ -20,6 +20,8 @@ services:
         value: true
       - key: SCRAPE_INTERVAL_MINUTES
         value: 360
+      - key: ENABLE_BROWSER_SCRAPING
+        value: true
 
   - type: web
     name: opportunity-frontend

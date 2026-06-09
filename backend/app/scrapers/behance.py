@@ -22,6 +22,12 @@ class BehanceScraper(ResilientScraperMixin, BaseScraper):
         jobs = self._parse_json_state(soup)
         if not jobs:
             jobs = self._parse_html_cards(soup)
+        if not jobs:
+            try:
+                rendered_soup = BeautifulSoup(self.get_rendered_html(self.joblist_url), "html.parser")
+                jobs = self._parse_json_state(rendered_soup) or self._parse_html_cards(rendered_soup)
+            except Exception:
+                jobs = []
 
         return [job for job in jobs if is_design_related(job)]
 
@@ -39,6 +45,10 @@ class BehanceScraper(ResilientScraperMixin, BaseScraper):
         import re
 
         jobs: List[Dict[str, Any]] = []
+        decoded_objects = self._decode_script_json(text)
+        for decoded_object in decoded_objects:
+            jobs.extend(self._walk_json_for_jobs(decoded_object))
+
         for match in re.finditer(r"\{[^{}]*(?:title|jobTitle|name)[^{}]*(?:company|companyName)[^{}]*\}", text):
             try:
                 data = json.loads(match.group(0))
@@ -47,6 +57,41 @@ class BehanceScraper(ResilientScraperMixin, BaseScraper):
             job = self._coerce_job(data)
             if job:
                 jobs.append(job)
+        return jobs
+
+    def _decode_script_json(self, text: str) -> List[Any]:
+        import json
+        import re
+
+        decoded = []
+        stripped = text.strip()
+        candidates = [stripped]
+
+        for pattern in (
+            r"window\.__INITIAL_STATE__\s*=\s*(\{.*?\});",
+            r"window\.__NEXT_DATA__\s*=\s*(\{.*?\});",
+            r"self\.__next_f\.push\(\[.*?,\s*'(.*?)'\]\)",
+        ):
+            candidates.extend(match.group(1) for match in re.finditer(pattern, text, re.DOTALL))
+
+        for candidate in candidates:
+            try:
+                decoded.append(json.loads(candidate))
+            except json.JSONDecodeError:
+                continue
+        return decoded
+
+    def _walk_json_for_jobs(self, data: Any) -> List[Dict[str, Any]]:
+        jobs: List[Dict[str, Any]] = []
+        if isinstance(data, dict):
+            coerced = self._coerce_job(data)
+            if coerced:
+                jobs.append(coerced)
+            for value in data.values():
+                jobs.extend(self._walk_json_for_jobs(value))
+        elif isinstance(data, list):
+            for item in data:
+                jobs.extend(self._walk_json_for_jobs(item))
         return jobs
 
     def _parse_html_cards(self, soup: BeautifulSoup) -> List[Dict[str, Any]]:
