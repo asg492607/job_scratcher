@@ -5,7 +5,9 @@ from sqlalchemy.orm import Session
 from app.categorization.classifier import OpportunityClassifier
 from app.repositories.opportunity_repo import OpportunityRepository
 from app.schemas.opportunity import OpportunityCreate
+from app.scrapers.arbeitnow import ArbeitnowScraper
 from app.scrapers.behance import BehanceScraper
+from app.scrapers.remotive import RemotiveScraper
 
 
 class ScrapingService:
@@ -13,6 +15,8 @@ class ScrapingService:
         self.repo = OpportunityRepository(db)
         self.classifier = OpportunityClassifier()
         self.scrapers = {
+            "remotive": RemotiveScraper(),
+            "arbeitnow": ArbeitnowScraper(),
             "behance": BehanceScraper(),
         }
 
@@ -21,7 +25,17 @@ class ScrapingService:
         if not scraper:
             return {"source": source, "created": 0, "updated": 0, "error": "Unknown source"}
 
-        raw_items = scraper.scrape()
+        try:
+            raw_items = scraper.scrape()
+        except Exception as error:
+            return {
+                "source": source,
+                "fetched": 0,
+                "created": 0,
+                "updated": 0,
+                "error": str(error),
+            }
+
         created = 0
         updated = 0
 

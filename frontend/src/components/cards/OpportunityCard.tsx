@@ -38,6 +38,11 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({ opportunity })
                 New
               </span>
             )}
+            {opportunity.source && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-50 text-slate-600">
+                {opportunity.source}
+              </span>
+            )}
           </div>
         </div>
 
