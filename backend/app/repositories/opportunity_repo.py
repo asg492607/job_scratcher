@@ -13,6 +13,9 @@ class OpportunityRepository:
     def get_by_id(self, opp_id: str):
         return self.db.query(Opportunity).filter(Opportunity.id == opp_id).first()
 
+    def get_by_apply_url(self, apply_url: str):
+        return self.db.query(Opportunity).filter(Opportunity.apply_url == apply_url).first()
+
     def _get_or_create_skills(self, skill_names: list[str]):
         skills = []
         for name in skill_names:
@@ -34,6 +37,20 @@ class OpportunityRepository:
         self.db.commit()
         self.db.refresh(new_opp)
         return new_opp
+
+    def upsert_by_apply_url(self, opp_data: OpportunityCreate):
+        existing = self.get_by_apply_url(str(opp_data.apply_url)) if opp_data.apply_url else None
+        if existing:
+            update_data = opp_data.dict(exclude={"skills"}, exclude_unset=True)
+            for key, value in update_data.items():
+                setattr(existing, key, value)
+            if opp_data.skills:
+                existing.skills = self._get_or_create_skills(opp_data.skills)
+            self.db.commit()
+            self.db.refresh(existing)
+            return existing, False
+
+        return self.create(opp_data), True
 
     def update(self, opp_id: str, opp_data: OpportunityUpdate):
         opp = self.get_by_id(opp_id)

@@ -1,3 +1,8 @@
+databases:
+  - name: opportunity-db
+    databaseName: opportunity_db
+    user: opportunity_user
+
 services:
   - type: web
     name: opportunity-backend
@@ -6,9 +11,15 @@ services:
     startCommand: "cd backend && gunicorn app.main:app -k uvicorn.workers.UvicornWorker -c gunicorn.conf.py"
     envVars:
       - key: DATABASE_URL
-        value: sqlite:///./jobscractecher.db
+        fromDatabase:
+          name: opportunity-db
+          property: connectionString
       - key: ALLOWED_ORIGINS
         value: https://opportunity-frontend.onrender.com
+      - key: ENABLE_BACKGROUND_SCRAPING
+        value: true
+      - key: SCRAPE_INTERVAL_MINUTES
+        value: 360
 
   - type: web
     name: opportunity-frontend
