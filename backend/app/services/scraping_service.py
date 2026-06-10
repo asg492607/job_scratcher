@@ -7,6 +7,7 @@ from app.repositories.opportunity_repo import OpportunityRepository
 from app.schemas.opportunity import OpportunityCreate
 from app.scrapers.arbeitnow import ArbeitnowScraper
 from app.scrapers.behance import BehanceScraper
+from app.scrapers.jobspy_scraper import JobSpyScraper
 from app.scrapers.remotive import RemotiveScraper
 from app.scrapers.the_muse import TheMuseScraper
 
@@ -20,6 +21,7 @@ class ScrapingService:
             "arbeitnow": ArbeitnowScraper(),
             "the_muse": TheMuseScraper(),
             "behance": BehanceScraper(),
+            "jobspy": JobSpyScraper(),
         }
 
     def scrape_source(self, source: str = "behance") -> Dict[str, Any]:
