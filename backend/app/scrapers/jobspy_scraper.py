@@ -24,9 +24,8 @@ class JobSpyScraper(BaseScraper):
     def __init__(
         self,
         site_names: List[str] | None = None,
-        location: str = "India",
+        locations: List[str] | None = None,
         results_wanted: int = 25,
-        country_indeed: str = "India",
     ):
         self.site_names = site_names or [
             "indeed",
@@ -34,9 +33,14 @@ class JobSpyScraper(BaseScraper):
             "glassdoor",
             "zip_recruiter",
         ]
-        self.location = location
+        self.locations = locations or [
+            "Remote",
+            "United States",
+            "United Kingdom",
+            "India",
+            "Canada",
+        ]
         self.results_wanted = results_wanted
-        self.country_indeed = country_indeed
 
     # ── public interface ──────────────────────────────────────────────
 
@@ -49,33 +53,33 @@ class JobSpyScraper(BaseScraper):
 
         all_jobs: List[Dict[str, Any]] = []
 
-        for term in self.DESIGN_SEARCH_TERMS:
-            try:
-                df = scrape_jobs(
-                    site_name=self.site_names,
-                    search_term=term,
-                    location=self.location,
-                    results_wanted=self.results_wanted,
-                    country_indeed=self.country_indeed,
-                    hours_old=72,  # only last 3 days
-                )
+        for loc in self.locations:
+            for term in self.DESIGN_SEARCH_TERMS:
+                try:
+                    df = scrape_jobs(
+                        site_name=self.site_names,
+                        search_term=term,
+                        location=loc,
+                        results_wanted=self.results_wanted,
+                        hours_old=72,  # only last 3 days
+                    )
 
-                for _, row in df.iterrows():
-                    job = {
-                        "raw_title": _str(row.get("title")),
-                        "company_name": _str(row.get("company_name")),
-                        "job_description": _str(row.get("description")),
-                        "job_location": _str(row.get("location")),
-                        "salary": _build_salary(row),
-                        "url": _str(row.get("job_url")),
-                        "site": _str(row.get("site")),
-                        "date_posted": _str(row.get("date_posted")),
-                    }
-                    all_jobs.append(job)
+                    for _, row in df.iterrows():
+                        job = {
+                            "raw_title": _str(row.get("title")),
+                            "company_name": _str(row.get("company_name")),
+                            "job_description": _str(row.get("description")),
+                            "job_location": _str(row.get("location")),
+                            "salary": _build_salary(row),
+                            "url": _str(row.get("job_url")),
+                            "site": _str(row.get("site")),
+                            "date_posted": _str(row.get("date_posted")),
+                        }
+                        all_jobs.append(job)
 
-            except Exception as exc:
-                print(f"[JobSpyScraper] Error scraping '{term}': {exc}")
-                continue
+                except Exception as exc:
+                    print(f"[JobSpyScraper] Error scraping '{term}' in '{loc}': {exc}")
+                    continue
 
         design_jobs = [j for j in all_jobs if is_design_related(j)]
         return dedupe_jobs(design_jobs)
