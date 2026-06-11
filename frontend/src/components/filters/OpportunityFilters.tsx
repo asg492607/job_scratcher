@@ -1,6 +1,6 @@
 import React from 'react';
 import { useOpportunityStore } from '../../app/store';
-import { Category, RemoteStatus, Domain, Difficulty } from '../../types/opportunity';
+import { Category, RemoteStatus, Domain } from '../../types/opportunity';
 
 export const OpportunityFilters: React.FC = () => {
   const { filters, setFilters, clearFilters } = useOpportunityStore();
