@@ -25,27 +25,32 @@ export const OpportunityFilters: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-6">
+    <div className="sidebar-glass p-6 space-y-6 sticky top-24">
       <div>
-        <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-3">Search</h3>
-        <input
-          type="text"
-          placeholder="Search opportunities..."
-          value={filters.search || ''}
-          onChange={handleSearchChange}
-          className="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-        />
+        <h3 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--text-secondary)' }}>Search</h3>
+        <div className="relative">
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--text-muted)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            type="text"
+            placeholder="Search keywords..."
+            value={filters.search || ''}
+            onChange={handleSearchChange}
+            className="input-dark pl-9"
+          />
+        </div>
       </div>
 
       <div>
-        <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-3">Filters</h3>
+        <h3 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--text-secondary)' }}>Filters</h3>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
+            <label className="block text-[11px] font-semibold uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-muted)' }}>Category</label>
             <select
               value={filters.category?.[0] || ''}
               onChange={handleCategoryChange}
-              className="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-white"
+              className="select-dark"
             >
               <option value="">All Categories</option>
               <option value="internship">Internships</option>
@@ -58,11 +63,11 @@ export const OpportunityFilters: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Work Type</label>
+            <label className="block text-[11px] font-semibold uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-muted)' }}>Work Type</label>
             <select
               value={filters.remote_status?.[0] || ''}
               onChange={handleRemoteStatusChange}
-              className="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-white"
+              className="select-dark"
             >
               <option value="">All Types</option>
               <option value="remote">Remote</option>
@@ -72,11 +77,11 @@ export const OpportunityFilters: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Design Domain</label>
+            <label className="block text-[11px] font-semibold uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-muted)' }}>Design Domain</label>
             <select
               value={filters.domain?.[0] || ''}
               onChange={handleDomainChange}
-              className="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-white"
+              className="select-dark"
             >
               <option value="">All Domains</option>
               <option value="ux_ui">UI/UX Design</option>
@@ -91,12 +96,15 @@ export const OpportunityFilters: React.FC = () => {
         </div>
       </div>
 
-      <div className="pt-4 border-t border-slate-100">
+      <div className="pt-4 border-t" style={{ borderColor: 'var(--border)' }}>
         <button
           onClick={clearFilters}
-          className="w-full px-4 py-2 border border-slate-300 shadow-sm text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+          className="btn-outline w-full flex items-center justify-center gap-2"
         >
-          Clear All Filters
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+          Clear Filters
         </button>
       </div>
     </div>
