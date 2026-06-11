@@ -37,7 +37,7 @@ class JobSpyScraper(BaseScraper):
         self,
         site_names: List[str] | None = None,
         locations: List[str] | None = None,
-        results_wanted: int = 20,
+        results_wanted: int = 150,
     ):
         self.site_names = site_names or ["linkedin", "indeed"]
         self.locations = locations or [

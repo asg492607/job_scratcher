@@ -18,7 +18,7 @@ def get_scraping_service(db: Session = Depends(get_db)):
 @router.get("", response_model=List[OpportunityResponse])
 def get_opportunities(
     skip: int = 0,
-    limit: int = 100,
+    limit: int = 20000,
     search: Optional[str] = None,
     category: Optional[List[str]] = None,
     remote_status: Optional[List[str]] = None,
