@@ -19,7 +19,12 @@ export const fetchOpportunities = async (filters?: OpportunityFilters): Promise<
       throw new Error('Network response was not ok');
     }
     
-    return await response.json();
+    const data = await response.json();
+    if (!Array.isArray(data)) {
+      console.error("Expected array but got:", data);
+      return [];
+    }
+    return data;
   } catch (error) {
     console.error('Error fetching opportunities:', error);
     throw error;

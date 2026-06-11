@@ -15,7 +15,7 @@ def get_repo(db: Session = Depends(get_db)):
 def get_scraping_service(db: Session = Depends(get_db)):
     return ScrapingService(db)
 
-@router.get("/", response_model=List[OpportunityResponse])
+@router.get("", response_model=List[OpportunityResponse])
 def get_opportunities(
     skip: int = 0,
     limit: int = 100,
@@ -53,7 +53,7 @@ def get_opportunity(opp_id: str, repo: OpportunityRepository = Depends(get_repo)
         raise HTTPException(status_code=404, detail="Opportunity not found")
     return opp
 
-@router.post("/", response_model=OpportunityResponse, status_code=201)
+@router.post("", response_model=OpportunityResponse, status_code=201)
 def create_opportunity(opp: OpportunityCreate, repo: OpportunityRepository = Depends(get_repo)):
     return repo.create(opp)
 
