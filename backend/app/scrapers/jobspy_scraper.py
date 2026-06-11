@@ -42,7 +42,7 @@ class JobSpyScraper(BaseScraper):
         self.site_names = site_names or ["linkedin", "indeed"]
         self.locations = locations or [
             # Global
-            "Remote",
+            "worldwide",
             "United States",
             "United Kingdom",
             "Canada",

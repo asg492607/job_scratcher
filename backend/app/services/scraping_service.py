@@ -34,12 +34,12 @@ class ScrapingService:
             "behance": BehanceScraper(),
             "dribbble": DribbbleScraper(),
             "coroflot": CoroflotScraper(),
-            "krop": KropScraper(),
+            # "krop": KropScraper(), # Returns 404
             "motionographer": MotionographerScraper(),
-            "smashing_magazine": SmashingMagScraper(),
-            "creativepool": CreativepoolScraper(),
+            # "smashing_magazine": SmashingMagScraper(), # Returns 404
+            # "creativepool": CreativepoolScraper(), # Returns 403
             # ── Remote-First ─────────────────────────────────────────────
-            "justremote": JustRemoteScraper(),
+            # "justremote": JustRemoteScraper(), # API format changed
             # ── India-Specific ───────────────────────────────────────────
             "internshala": IntershalaScraper(),
             # ── Multi-Platform Aggregator ─────────────────────────────────
