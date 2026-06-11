@@ -27,7 +27,7 @@ class ScrapingService:
             # ── Public APIs ─────────────────────────────────────────────
             "remotive": RemotiveScraper(),
             "arbeitnow": ArbeitnowScraper(),
-            "the_muse": TheMuseScraper(),
+            # "the_muse": TheMuseScraper(), # Returns 404 landing pages
             "remoteok": RemoteOKScraper(),
             "himalayas": HimalayasScraper(),
             # ── RSS Feeds ────────────────────────────────────────────────
