@@ -18,6 +18,8 @@ from app.scrapers.remotive import RemotiveScraper
 from app.scrapers.the_muse import TheMuseScraper
 from app.scrapers.weworkremotely import WeWorkRemotelyScraper
 from app.scrapers.reliable_apis import RemoteOKScraper, HimalayasScraper
+from app.scrapers.startups import YCombinatorScraper
+from app.scrapers.freelance import UpworkScraper, UXJobsBoardScraper
 
 
 class ScrapingService:
@@ -32,9 +34,12 @@ class ScrapingService:
             # "the_muse": TheMuseScraper(), # Returns 404 landing pages
             "remoteok": RemoteOKScraper(),
             "himalayas": HimalayasScraper(),
+            "ycombinator": YCombinatorScraper(),
+            "uxjobsboard": UXJobsBoardScraper(),
             # ── RSS Feeds ────────────────────────────────────────────────
             "weworkremotely": WeWorkRemotelyScraper(),
             "authentic_jobs": AuthenticJobsScraper(),
+            "upwork": UpworkScraper(),
             # ── Design Community Boards ──────────────────────────────────
             "behance": BehanceScraper(),
             "dribbble": DribbbleScraper(),
