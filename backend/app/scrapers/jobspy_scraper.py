@@ -7,6 +7,7 @@ class JobSpyScraper(BaseScraper):
     """
     Scraper powered by python-jobspy.
     Only uses LinkedIn and Indeed — ZipRecruiter and Glassdoor block scrapers with 403.
+    Searches across major global cities + all major Indian cities.
     """
 
     DESIGN_SEARCH_TERMS = [
@@ -22,6 +23,14 @@ class JobSpyScraper(BaseScraper):
         "interaction designer",
         "creative designer",
         "design fellowship",
+        "illustration designer",
+        "logo designer",
+        "typography designer",
+        "3D designer",
+        "animation designer",
+        "UI designer",
+        "UX designer",
+        "design hackathon",
     ]
 
     def __init__(
@@ -30,20 +39,33 @@ class JobSpyScraper(BaseScraper):
         locations: List[str] | None = None,
         results_wanted: int = 20,
     ):
-        # Only LinkedIn and Indeed reliably work without WAF blocks
         self.site_names = site_names or ["linkedin", "indeed"]
         self.locations = locations or [
+            # Global
             "Remote",
             "United States",
-            "India",
             "United Kingdom",
             "Canada",
             "Germany",
             "Australia",
+            "Singapore",
+            "Netherlands",
+            "United Arab Emirates",
+            # India — major design hubs
+            "Bangalore, India",
+            "Mumbai, India",
+            "Delhi, India",
+            "Hyderabad, India",
+            "Pune, India",
+            "Chennai, India",
+            "Kolkata, India",
+            "Ahmedabad, India",
+            "Noida, India",
+            "Gurgaon, India",
+            "Jaipur, India",
+            "Indore, India",
         ]
         self.results_wanted = results_wanted
-
-    # ── public interface ──────────────────────────────────────────────
 
     def scrape(self) -> List[Dict[str, Any]]:
         try:
@@ -62,7 +84,7 @@ class JobSpyScraper(BaseScraper):
                         search_term=term,
                         location=loc,
                         results_wanted=self.results_wanted,
-                        hours_old=168,  # last 7 days for more results
+                        hours_old=168,  # last 7 days
                     )
 
                     for _, row in df.iterrows():
@@ -100,7 +122,6 @@ _SITE_LABELS = {
 
 
 def _str(value: Any) -> str | None:
-    """Convert pandas-like values (including NaN) to str or None."""
     if value is None:
         return None
     import math
@@ -114,11 +135,9 @@ def _str(value: Any) -> str | None:
 
 
 def _build_salary(row: Any) -> str | None:
-    """Build a salary string from min/max/currency columns if present."""
     lo = row.get("min_amount")
     hi = row.get("max_amount")
     cur = row.get("currency", "")
-
     parts: List[str] = []
     if lo is not None and _str(lo):
         parts.append(str(lo))
@@ -126,7 +145,6 @@ def _build_salary(row: Any) -> str | None:
         parts.append(str(hi))
     if not parts:
         return None
-
     salary = " – ".join(parts)
     if _str(cur):
         salary = f"{cur} {salary}"
