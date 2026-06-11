@@ -115,7 +115,16 @@ async function loadOpportunities() {
     const res = await fetch(url);
     
     if (!res.ok) throw new Error('Failed to fetch data');
-    opportunities = await res.json();
+    let fetchedOps = await res.json();
+    
+    // Prioritize LinkedIn jobs at the top
+    opportunities = fetchedOps.sort((a, b) => {
+      const isALinkedIn = a.source && a.source.toLowerCase().includes('linkedin');
+      const isBLinkedIn = b.source && b.source.toLowerCase().includes('linkedin');
+      if (isALinkedIn && !isBLinkedIn) return -1;
+      if (!isALinkedIn && isBLinkedIn) return 1;
+      return 0; // Keep existing order for the rest
+    });
     
     if (opportunities.length === 0) {
       showState('empty');
