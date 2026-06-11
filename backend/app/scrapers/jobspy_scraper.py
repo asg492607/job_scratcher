@@ -6,8 +6,7 @@ from app.scrapers.common import dedupe_jobs, is_design_related, normalize_job
 class JobSpyScraper(BaseScraper):
     """
     Scraper powered by python-jobspy.
-    Aggregates design jobs from LinkedIn, Indeed, Glassdoor, and ZipRecruiter
-    in a single call.
+    Only uses LinkedIn and Indeed — ZipRecruiter and Glassdoor block scrapers with 403.
     """
 
     DESIGN_SEARCH_TERMS = [
@@ -19,26 +18,28 @@ class JobSpyScraper(BaseScraper):
         "brand designer",
         "design intern",
         "UX researcher",
+        "web designer",
+        "interaction designer",
+        "creative designer",
+        "design fellowship",
     ]
 
     def __init__(
         self,
         site_names: List[str] | None = None,
         locations: List[str] | None = None,
-        results_wanted: int = 25,
+        results_wanted: int = 20,
     ):
-        self.site_names = site_names or [
-            "indeed",
-            "linkedin",
-            "glassdoor",
-            "zip_recruiter",
-        ]
+        # Only LinkedIn and Indeed reliably work without WAF blocks
+        self.site_names = site_names or ["linkedin", "indeed"]
         self.locations = locations or [
             "Remote",
             "United States",
-            "United Kingdom",
             "India",
+            "United Kingdom",
             "Canada",
+            "Germany",
+            "Australia",
         ]
         self.results_wanted = results_wanted
 
@@ -61,7 +62,7 @@ class JobSpyScraper(BaseScraper):
                         search_term=term,
                         location=loc,
                         results_wanted=self.results_wanted,
-                        hours_old=72,  # only last 3 days
+                        hours_old=168,  # last 7 days for more results
                     )
 
                     for _, row in df.iterrows():
@@ -95,8 +96,6 @@ class JobSpyScraper(BaseScraper):
 _SITE_LABELS = {
     "linkedin": "LinkedIn",
     "indeed": "Indeed",
-    "glassdoor": "Glassdoor",
-    "zip_recruiter": "ZipRecruiter",
 }
 
 
