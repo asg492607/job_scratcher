@@ -4,6 +4,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1.opportunities import router as opportunities_router
+from app.api.v1.stats import router as stats_router
 from app.database.session import SessionLocal, engine
 from app.database.base import Base
 from app.services.scraping_service import ScrapingService
@@ -31,6 +32,7 @@ app.add_middleware(
 )
 
 app.include_router(opportunities_router, prefix="/api/v1")
+app.include_router(stats_router, prefix="/api/v1")
 
 def run_scheduled_scrape():
     db = SessionLocal()

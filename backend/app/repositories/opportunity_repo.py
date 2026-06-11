@@ -12,6 +12,7 @@ class OpportunityRepository:
         skip: int = 0,
         limit: int = 100,
         search: str | None = None,
+        company: str | None = None,
         category: list[str] | None = None,
         remote_status: list[str] | None = None,
         domain: list[str] | None = None,
@@ -27,6 +28,8 @@ class OpportunityRepository:
                 | Opportunity.company.ilike(search_term)
                 | Opportunity.description.ilike(search_term)
             )
+        if company:
+            query = query.filter(Opportunity.company.ilike(f"%{company}%"))
         if category:
             query = query.filter(Opportunity.category.in_(category))
         if remote_status:
