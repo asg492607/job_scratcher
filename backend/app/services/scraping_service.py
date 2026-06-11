@@ -16,6 +16,7 @@ from app.scrapers.krop_motionographer import KropScraper, MotionographerScraper
 from app.scrapers.remotive import RemotiveScraper
 from app.scrapers.the_muse import TheMuseScraper
 from app.scrapers.weworkremotely import WeWorkRemotelyScraper
+from app.scrapers.reliable_apis import RemoteOKScraper, HimalayasScraper
 
 
 class ScrapingService:
@@ -27,6 +28,8 @@ class ScrapingService:
             "remotive": RemotiveScraper(),
             "arbeitnow": ArbeitnowScraper(),
             "the_muse": TheMuseScraper(),
+            "remoteok": RemoteOKScraper(),
+            "himalayas": HimalayasScraper(),
             # ── RSS Feeds ────────────────────────────────────────────────
             "weworkremotely": WeWorkRemotelyScraper(),
             "authentic_jobs": AuthenticJobsScraper(),
