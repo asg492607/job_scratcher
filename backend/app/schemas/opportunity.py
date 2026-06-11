@@ -18,10 +18,14 @@ class SkillResponse(SkillBase):
 class OpportunityBase(BaseModel):
     title: str
     company: Optional[str] = None
+    normalized_company: Optional[str] = None
     description: Optional[str] = None
     location: Optional[str] = None
     remote_status: Optional[RemoteStatus] = None
     salary: Optional[str] = None
+    min_salary: Optional[float] = None
+    max_salary: Optional[float] = None
+    currency: Optional[str] = None
     stipend: Optional[str] = None
     experience_level: Optional[str] = None
     deadline: Optional[datetime] = None
@@ -32,6 +36,8 @@ class OpportunityBase(BaseModel):
     difficulty: Optional[DifficultyLevel] = None
     industry: Optional[str] = None
     quality_score: Optional[float] = None
+    freshness_score: Optional[float] = None
+    source_reliability_score: Optional[float] = None
     growth_potential: Optional[str] = None
     portfolio_required: bool = False
     is_active: bool = True
@@ -42,10 +48,14 @@ class OpportunityCreate(OpportunityBase):
 class OpportunityUpdate(BaseModel):
     title: Optional[str] = None
     company: Optional[str] = None
+    normalized_company: Optional[str] = None
     description: Optional[str] = None
     location: Optional[str] = None
     remote_status: Optional[RemoteStatus] = None
     salary: Optional[str] = None
+    min_salary: Optional[float] = None
+    max_salary: Optional[float] = None
+    currency: Optional[str] = None
     stipend: Optional[str] = None
     experience_level: Optional[str] = None
     deadline: Optional[datetime] = None
@@ -56,6 +66,8 @@ class OpportunityUpdate(BaseModel):
     difficulty: Optional[DifficultyLevel] = None
     industry: Optional[str] = None
     quality_score: Optional[float] = None
+    freshness_score: Optional[float] = None
+    source_reliability_score: Optional[float] = None
     growth_potential: Optional[str] = None
     portfolio_required: Optional[bool] = None
     is_active: Optional[bool] = None

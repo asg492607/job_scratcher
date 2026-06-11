@@ -46,10 +46,14 @@ class Opportunity(Base):
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     title = Column(String, nullable=False)
     company = Column(String, nullable=True)
+    normalized_company = Column(String, nullable=True)
     description = Column(Text, nullable=True)
     location = Column(String, nullable=True)
     remote_status = Column(SQLEnum(RemoteStatus), nullable=True)
     salary = Column(String, nullable=True)
+    min_salary = Column(Float, nullable=True)
+    max_salary = Column(Float, nullable=True)
+    currency = Column(String, nullable=True)
     stipend = Column(String, nullable=True)
     experience_level = Column(String, nullable=True)
     deadline = Column(DateTime, nullable=True)
@@ -62,6 +66,9 @@ class Opportunity(Base):
     industry = Column(String, nullable=True)
     
     quality_score = Column(Float, nullable=True)
+    freshness_score = Column(Float, nullable=True)
+    source_reliability_score = Column(Float, nullable=True)
+    
     growth_potential = Column(Text, nullable=True)
     portfolio_required = Column(Boolean, default=False)
     

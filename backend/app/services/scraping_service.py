@@ -3,6 +3,7 @@ from typing import Any, Dict
 from sqlalchemy.orm import Session
 
 from app.categorization.classifier import OpportunityClassifier
+from app.intelligence.pipeline import IntelligencePipeline
 from app.repositories.opportunity_repo import OpportunityRepository
 from app.schemas.opportunity import OpportunityCreate
 from app.scrapers.arbeitnow import ArbeitnowScraper
@@ -23,6 +24,7 @@ class ScrapingService:
     def __init__(self, db: Session):
         self.repo = OpportunityRepository(db)
         self.classifier = OpportunityClassifier()
+        self.pipeline = IntelligencePipeline()
         self.scrapers = {
             # ── Public APIs ─────────────────────────────────────────────
             "remotive": RemotiveScraper(),
@@ -71,15 +73,18 @@ class ScrapingService:
         for raw_item in raw_items:
             try:
                 normalized = scraper.normalize(raw_item)
-                classification = self.classifier.classify(
-                    normalized.get("title") or "",
-                    normalized.get("description") or "",
-                )
-                normalized.update(classification)
-
-                opportunity, was_created = self.repo.upsert_by_apply_url(
-                    OpportunityCreate(**normalized)
-                )
+                
+                # Pass through intelligence pipeline
+                enhanced_job = self.pipeline.process_job(normalized)
+                
+                # Apply classifier for skills (existing logic)
+                skills = self.classifier.classify_skills(enhanced_job.get("description", ""))
+                enhanced_job["skills"] = list(skills)
+                
+                # The repo advanced deduplication will handle insertion
+                opp_data = OpportunityCreate(**enhanced_job)
+                opportunity, was_created = self.repo.upsert_by_advanced_dedupe(opp_data)
+                
                 if opportunity and was_created:
                     created += 1
                 else:

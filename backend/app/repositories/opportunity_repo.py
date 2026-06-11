@@ -68,19 +68,34 @@ class OpportunityRepository:
         self.db.refresh(new_opp)
         return new_opp
 
-    def upsert_by_apply_url(self, opp_data: OpportunityCreate):
-        existing = self.get_by_apply_url(str(opp_data.apply_url)) if opp_data.apply_url else None
-        if existing:
-            update_data = opp_data.dict(exclude={"skills"}, exclude_unset=True)
-            for key, value in update_data.items():
-                setattr(existing, key, value)
-            if opp_data.skills:
-                existing.skills = self._get_or_create_skills(opp_data.skills)
-            self.db.commit()
-            self.db.refresh(existing)
-            return existing, False
-
+    def upsert_by_advanced_dedupe(self, opp_data: OpportunityCreate):
+        # 1. Exact URL match
+        if opp_data.apply_url:
+            existing = self.get_by_apply_url(str(opp_data.apply_url))
+            if existing:
+                return self._update_existing(existing, opp_data), False
+                
+        # 2. Fuzzy match: Title + Company + Location
+        if opp_data.title and opp_data.normalized_company and opp_data.location:
+            existing = self.db.query(Opportunity).filter(
+                Opportunity.title == opp_data.title,
+                Opportunity.normalized_company == opp_data.normalized_company,
+                Opportunity.location == opp_data.location
+            ).first()
+            if existing:
+                return self._update_existing(existing, opp_data), False
+                
         return self.create(opp_data), True
+
+    def _update_existing(self, existing: Opportunity, opp_data: OpportunityCreate):
+        update_data = opp_data.dict(exclude={"skills"}, exclude_unset=True)
+        for key, value in update_data.items():
+            setattr(existing, key, value)
+        if opp_data.skills:
+            existing.skills = self._get_or_create_skills(opp_data.skills)
+        self.db.commit()
+        self.db.refresh(existing)
+        return existing
 
     def update(self, opp_id: str, opp_data: OpportunityUpdate):
         opp = self.get_by_id(opp_id)
