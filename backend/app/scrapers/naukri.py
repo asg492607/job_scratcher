@@ -30,7 +30,7 @@ class NaukriScraper(BaseScraper):
             for keyword in self.search_keywords:
                 try:
                     params = {
-                        "noOfResults": 30,
+                        "noOfResults": 100,
                         "urlType": "search_by_keyword",
                         "searchType": "adv",
                         "keyword": keyword,

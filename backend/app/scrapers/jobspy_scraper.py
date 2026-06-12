@@ -41,7 +41,7 @@ class JobSpyScraper(BaseScraper):
     ):
         self.site_names = site_names or ["linkedin", "indeed"]
         self.locations = locations or [
-            # India — National & Major Design Hubs
+            # India FIRST Priority
             "India",
             "Remote, India",
             "Bangalore, India",
@@ -59,9 +59,20 @@ class JobSpyScraper(BaseScraper):
             "Jaipur, India",
             "Indore, India",
             "Kochi, India",
-            "Coimbatore, India"
+            "Coimbatore, India",
+            # Global (Secondary Priority)
+            "worldwide",
+            "Remote",
+            "United States",
+            "United Kingdom",
+            "Canada",
+            "Germany",
+            "Australia",
+            "Singapore",
+            "Netherlands",
+            "United Arab Emirates",
         ]
-        self.results_wanted = results_wanted
+        self.results_wanted = 1000
 
     def scrape(self) -> List[Dict[str, Any]]:
         try:
