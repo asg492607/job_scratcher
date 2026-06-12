@@ -91,7 +91,7 @@ class JobSpyScraper(BaseScraper):
                         search_term=term,
                         location=loc,
                         results_wanted=self.results_wanted,
-                        hours_old=168,  # last 7 days
+                        hours_old=720,  # last 30 days (allows older active jobs)
                     )
 
                     for _, row in df.iterrows():
