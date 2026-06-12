@@ -1,26 +1,17 @@
 from typing import Any, Dict, List
-import httpx
 from bs4 import BeautifulSoup
 import time
 import random
 import urllib.parse
 from app.scrapers.base import BaseScraper
 from app.scrapers.common import dedupe_jobs, is_design_related, normalize_job
+from app.scrapers.playwright_client import PlaywrightStealthClient
 
 class LinkedInScraper(BaseScraper):
     """
     Custom robust LinkedIn Scraper targeting the jobs-guest API.
-    Utilizes evasive maneuvers (user-agent rotation, randomized delays, exponential backoff)
-    to minimize 429 Too Many Requests blocks on cloud servers.
+    Utilizes Playwright Stealth Mode to completely bypass anti-bot mechanisms.
     """
-
-    USER_AGENTS = [
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.2 Safari/605.1.15",
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0",
-        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    ]
 
     DESIGN_SEARCH_TERMS = [
         "UI UX Designer",
@@ -41,22 +32,10 @@ class LinkedInScraper(BaseScraper):
         # Base public jobs API endpoint
         self.base_url = "https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search"
 
-    def _get_headers(self):
-        return {
-            "User-Agent": random.choice(self.USER_AGENTS),
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-            "Accept-Language": "en-US,en;q=0.9",
-            "Sec-Fetch-Site": "none",
-            "Sec-Fetch-Mode": "navigate",
-            "Sec-Fetch-User": "?1",
-            "Sec-Fetch-Dest": "document",
-            "Cache-Control": "max-age=0"
-        }
-
     def scrape(self) -> List[Dict[str, Any]]:
         all_jobs: List[Dict[str, Any]] = []
 
-        with httpx.Client(timeout=30.0, follow_redirects=True) as client:
+        with PlaywrightStealthClient() as client:
             for location in self.LOCATIONS:
                 for term in self.DESIGN_SEARCH_TERMS:
                     
@@ -72,27 +51,13 @@ class LinkedInScraper(BaseScraper):
                                 "start": start
                             }
                             
-                            headers = self._get_headers()
+                            url = self.base_url + "?" + urllib.parse.urlencode(params)
                             
-                            # Exponential backoff loop
-                            max_retries = 3
-                            for attempt in range(max_retries):
-                                response = client.get(self.base_url, params=params, headers=headers)
+                            html = client.get_html(url)
+                            if not html:
+                                continue
                                 
-                                if response.status_code == 200:
-                                    break # Success
-                                elif response.status_code == 429:
-                                    # Rate limited. Backoff.
-                                    sleep_time = (2 ** attempt) + random.uniform(1, 3)
-                                    print(f"[LinkedInScraper] 429 Rate Limit. Sleeping {sleep_time:.2f}s...")
-                                    time.sleep(sleep_time)
-                                else:
-                                    break # Other error, break out of retry loop
-
-                            if response.status_code != 200:
-                                continue # Skip this pagination if still failing
-                                
-                            soup = BeautifulSoup(response.text, "html.parser")
+                            soup = BeautifulSoup(html, "html.parser")
                             job_cards = soup.find_all("li")
                             
                             if not job_cards:
@@ -113,7 +78,7 @@ class LinkedInScraper(BaseScraper):
                                 job = {
                                     "raw_title": title_el.get_text(strip=True),
                                     "company_name": company_el.get_text(strip=True) if company_el else "",
-                                    "job_description": "Scraped from LinkedIn Public API.", # Detail requires another req, omit to save rate limits
+                                    "job_description": "Scraped from LinkedIn Public API.", 
                                     "job_location": loc_el.get_text(strip=True) if loc_el else "",
                                     "salary": "",
                                     "url": job_url,

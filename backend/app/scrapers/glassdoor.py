@@ -5,12 +5,12 @@ import urllib.parse
 from bs4 import BeautifulSoup
 from app.scrapers.base import BaseScraper
 from app.scrapers.common import dedupe_jobs, is_design_related, normalize_job
-from app.scrapers.client import RobustHttpClient
+from app.scrapers.playwright_client import PlaywrightStealthClient
 
 class GlassdoorScraper(BaseScraper):
     """
     Scraper for Glassdoor.
-    Uses RobustHttpClient to try and bypass Cloudflare to fetch design jobs.
+    Uses Playwright Stealth Mode to completely bypass Cloudflare and execute JavaScript.
     """
     
     def __init__(self):
@@ -19,12 +19,13 @@ class GlassdoorScraper(BaseScraper):
     def scrape(self) -> List[Dict[str, Any]]:
         jobs: List[Dict[str, Any]] = []
         
-        with RobustHttpClient() as client:
+        with PlaywrightStealthClient() as client:
             try:
-                response = client.get(self.base_url)
+                # Wait for the job listing cards to render via JS
+                html = client.get_html(self.base_url, wait_selector=".react-job-listing")
                 
-                if response.status_code == 200:
-                    soup = BeautifulSoup(response.text, "html.parser")
+                if html:
+                    soup = BeautifulSoup(html, "html.parser")
                     job_cards = soup.find_all("li", class_="react-job-listing")
                     
                     for card in job_cards:
@@ -53,7 +54,7 @@ class GlassdoorScraper(BaseScraper):
                         jobs.append(job)
                         
             except Exception as e:
-                print(f"[GlassdoorScraper] Error fetching from {self.base_url}: {e}")
+                print(f"[GlassdoorScraper] Error parsing HTML: {e}")
                     
         design_jobs = [j for j in jobs if is_design_related(j)]
         return dedupe_jobs(design_jobs)
