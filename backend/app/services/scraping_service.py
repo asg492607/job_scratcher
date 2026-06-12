@@ -23,6 +23,7 @@ from app.scrapers.freelance import UpworkScraper, UXJobsBoardScraper
 from app.scrapers.naukri import NaukriScraper
 from app.scrapers.instahyre import InstahyreScraper
 from app.scrapers.cutshort import CutShortScraper
+from app.scrapers.linkedin import LinkedInScraper
 
 class ScrapingService:
     def __init__(self, db: Session):
@@ -30,13 +31,16 @@ class ScrapingService:
         self.classifier = OpportunityClassifier()
         self.pipeline = IntelligencePipeline()
         self.scrapers = {
+            # ── LinkedIn Dedicated (Custom Built for Max Resilience) ──────
+            "linkedin": LinkedInScraper(),
+            
             # ── India-Specific ───────────────────────────────────────────
             "naukri": NaukriScraper(),
             "instahyre": InstahyreScraper(),
             "cutshort": CutShortScraper(),
             "internshala": IntershalaScraper(),
             
-            # ── LinkedIn & Indeed (Global + India) ───────────────────────
+            # ── Indeed (Global + India via JobSpy) ───────────────────────
             "jobspy": JobSpyScraper(),
             
             # ── Public APIs ─────────────────────────────────────────────
