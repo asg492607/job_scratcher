@@ -41,29 +41,25 @@ class JobSpyScraper(BaseScraper):
     ):
         self.site_names = site_names or ["linkedin", "indeed"]
         self.locations = locations or [
-            # Global
-            "worldwide",
-            "United States",
-            "United Kingdom",
-            "Canada",
-            "Germany",
-            "Australia",
-            "Singapore",
-            "Netherlands",
-            "United Arab Emirates",
-            # India — major design hubs
+            # India — National & Major Design Hubs
+            "India",
+            "Remote, India",
             "Bangalore, India",
             "Mumbai, India",
+            "New Delhi, India",
             "Delhi, India",
             "Hyderabad, India",
             "Pune, India",
             "Chennai, India",
+            "Gurgaon, India",
+            "Noida, India",
             "Kolkata, India",
             "Ahmedabad, India",
-            "Noida, India",
-            "Gurgaon, India",
+            "Chandigarh, India",
             "Jaipur, India",
             "Indore, India",
+            "Kochi, India",
+            "Coimbatore, India"
         ]
         self.results_wanted = results_wanted
 
