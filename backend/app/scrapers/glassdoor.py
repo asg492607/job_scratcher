@@ -21,38 +21,48 @@ class GlassdoorScraper(BaseScraper):
         
         with PlaywrightStealthClient() as client:
             try:
-                # Wait for the job listing cards to render via JS
-                html = client.get_html(self.base_url, wait_selector=".react-job-listing")
-                
-                if html:
-                    soup = BeautifulSoup(html, "html.parser")
-                    job_cards = soup.find_all("li", class_="react-job-listing")
+                # Loop through 10 pages deep on Glassdoor
+                for page_num in range(1, 11):
+                    # Glassdoor URL structure for pages: _IP2.htm, _IP3.htm
+                    if page_num == 1:
+                        url = self.base_url
+                    else:
+                        url = self.base_url.replace(".htm", f"_IP{page_num}.htm")
+                        
+                    html = client.get_html(url, wait_selector=".react-job-listing")
                     
-                    for card in job_cards:
-                        title_el = card.find("a", class_="jobLink")
-                        company_el = card.find("div", class_="job-search-8ajk4a") or card.find("a", class_="job-search-1omwz04")
-                        loc_el = card.find("span", class_="job-search-1bmuu11") or card.find("div", class_="location")
-                        salary_el = card.find("span", class_="job-search-12z0d4a")
+                    if html:
+                        soup = BeautifulSoup(html, "html.parser")
+                        job_cards = soup.find_all("li", class_="react-job-listing")
                         
-                        if not title_el:
-                            continue
+                        if not job_cards:
+                            break # No more jobs
                             
-                        job_url = title_el.get("href", "")
-                        if job_url and not job_url.startswith("http"):
-                            job_url = "https://www.glassdoor.co.in" + job_url
+                        for card in job_cards:
+                            title_el = card.find("a", class_="jobLink")
+                            company_el = card.find("div", class_="job-search-8ajk4a") or card.find("a", class_="job-search-1omwz04")
+                            loc_el = card.find("span", class_="job-search-1bmuu11") or card.find("div", class_="location")
+                            salary_el = card.find("span", class_="job-search-12z0d4a")
                             
-                        job = {
-                            "raw_title": title_el.get_text(strip=True),
-                            "company_name": company_el.get_text(strip=True) if company_el else "",
-                            "job_description": "",
-                            "job_location": loc_el.get_text(strip=True) if loc_el else "India",
-                            "salary": salary_el.get_text(strip=True) if salary_el else "",
-                            "url": job_url or self.base_url,
-                            "site": "Glassdoor",
-                            "date_posted": ""
-                        }
-                        jobs.append(job)
-                        
+                            if not title_el:
+                                continue
+                                
+                            job_url = title_el.get("href", "")
+                            if job_url and not job_url.startswith("http"):
+                                job_url = "https://www.glassdoor.co.in" + job_url
+                                
+                            job = {
+                                "raw_title": title_el.get_text(strip=True),
+                                "company_name": company_el.get_text(strip=True) if company_el else "",
+                                "job_description": "",
+                                "job_location": loc_el.get_text(strip=True) if loc_el else "India",
+                                "salary": salary_el.get_text(strip=True) if salary_el else "",
+                                "url": job_url or self.base_url,
+                                "site": "Glassdoor",
+                                "date_posted": ""
+                            }
+                            jobs.append(job)
+                            
             except Exception as e:
                 print(f"[GlassdoorScraper] Error parsing HTML: {e}")
                     

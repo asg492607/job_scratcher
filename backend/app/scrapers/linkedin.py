@@ -39,9 +39,8 @@ class LinkedInScraper(BaseScraper):
             for location in self.LOCATIONS:
                 for term in self.DESIGN_SEARCH_TERMS:
                     
-                    # We will only pull the first few pages (0, 25, 50) per term/location 
-                    # to avoid hitting hard rate limits quickly.
-                    for start in [0, 25, 50]:
+                    # Deep Pagination: 0 to 1000 jobs (steps of 25) = 40 pages per keyword
+                    for start in range(0, 1000, 25):
                         try:
                             # f_TPR=r2592000 means past 30 days
                             params = {
