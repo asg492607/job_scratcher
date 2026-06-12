@@ -50,3 +50,33 @@ class OpportunityClassifier:
             "category": category,
             "domain": domain
         }
+
+    def classify_skills(self, description: str) -> set:
+        """
+        Extracts a set of skills from the description.
+        """
+        if not description:
+            return set()
+            
+        desc_lower = description.lower()
+        found_skills = set()
+        
+        # Comprehensive list of common tech/design skills
+        common_skills = [
+            "python", "javascript", "react", "node", "typescript", "java", "c++", "ruby", "php",
+            "aws", "docker", "kubernetes", "sql", "nosql", "postgres", "mongodb",
+            "figma", "sketch", "adobe xd", "photoshop", "illustrator", "invision",
+            "ui", "ux", "wireframing", "prototyping", "user research", "usability testing",
+            "html", "css", "tailwind", "sass",
+            "agile", "scrum", "jira", "git", "github", "gitlab"
+        ]
+        
+        for skill in common_skills:
+            # Add word boundary to avoid partial matches
+            import re
+            pattern = r'\b' + re.escape(skill) + r'\b'
+            if re.search(pattern, desc_lower):
+                # Standardize format (e.g. capitalize first letter or keep standard casing)
+                found_skills.add(skill.title() if skill not in ["ui", "ux", "aws", "sql", "html", "css", "php"] else skill.upper())
+                
+        return found_skills
