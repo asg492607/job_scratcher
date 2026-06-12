@@ -28,7 +28,8 @@ let filters = {
   search: '',
   category: '',
   remote_status: '',
-  domain: ''
+  domain: '',
+  sort: ''
 };
 
 // Initialize
@@ -59,12 +60,18 @@ function setupEventListeners() {
     loadOpportunities();
   });
 
+  document.getElementById('sort-select').addEventListener('change', (e) => {
+    filters.sort = e.target.value;
+    loadOpportunities();
+  });
+
   elements.clearFiltersBtn.addEventListener('click', () => {
-    filters = { search: '', category: '', remote_status: '', domain: '' };
+    filters = { search: '', category: '', remote_status: '', domain: '', sort: '' };
     elements.searchInput.value = '';
     elements.categorySelect.value = '';
     elements.remoteSelect.value = '';
     elements.domainSelect.value = '';
+    document.getElementById('sort-select').value = '';
     loadOpportunities();
   });
 
@@ -117,13 +124,20 @@ async function loadOpportunities() {
     if (!res.ok) throw new Error('Failed to fetch data');
     let fetchedOps = await res.json();
     
-    // Prioritize LinkedIn jobs at the top
+    // Sort logic
     opportunities = fetchedOps.sort((a, b) => {
-      const isALinkedIn = a.source && a.source.toLowerCase().includes('linkedin');
-      const isBLinkedIn = b.source && b.source.toLowerCase().includes('linkedin');
-      if (isALinkedIn && !isBLinkedIn) return -1;
-      if (!isALinkedIn && isBLinkedIn) return 1;
-      return 0; // Keep existing order for the rest
+      if (filters.sort === 'quality') {
+        return (b.quality_score || 0) - (a.quality_score || 0);
+      } else if (filters.sort === 'freshness') {
+        return (b.freshness_score || 0) - (a.freshness_score || 0);
+      } else {
+        // Default: LinkedIn first
+        const isALinkedIn = a.source && a.source.toLowerCase().includes('linkedin');
+        const isBLinkedIn = b.source && b.source.toLowerCase().includes('linkedin');
+        if (isALinkedIn && !isBLinkedIn) return -1;
+        if (!isALinkedIn && isBLinkedIn) return 1;
+        return 0;
+      }
     });
     
     if (opportunities.length === 0) {
@@ -159,10 +173,30 @@ function renderOpportunities() {
     // Build badges
     let badgesHTML = '';
     if (isNew) badgesHTML += `<span class="badge badge-new"><span class="pulse-dot"></span>New</span>`;
+    
+    // Quality Score Badge
+    if (opp.quality_score) {
+      let qClass = 'badge-quality-medium';
+      if (opp.quality_score >= 80) qClass = 'badge-quality-high';
+      else if (opp.quality_score < 50) qClass = 'badge-quality-low';
+      badgesHTML += `<span class="badge ${qClass}">⚡ Q: ${opp.quality_score}</span>`;
+    }
+
     if (opp.category) badgesHTML += `<span class="badge badge-${opp.category.replace(' ', '-')}">${opp.category}</span>`;
     if (opp.remote_status) badgesHTML += `<span class="badge badge-${opp.remote_status}">${opp.remote_status}</span>`;
+    if (opp.experience_level && opp.experience_level !== "Not Specified") badgesHTML += `<span class="badge badge-experience">${opp.experience_level}</span>`;
     if (opp.source) badgesHTML += `<span class="badge badge-source">${opp.source}</span>`;
-    if (opp.salary || opp.stipend) badgesHTML += `<span class="badge badge-salary">${opp.salary || opp.stipend}</span>`;
+    
+    // Formatting Salary
+    let displaySalary = opp.salary || opp.stipend;
+    if (!displaySalary && opp.min_salary) {
+      const curr = opp.currency || '$';
+      displaySalary = `${curr}${Math.round(opp.min_salary/1000)}k`;
+      if (opp.max_salary && opp.max_salary !== opp.min_salary) {
+        displaySalary += ` - ${Math.round(opp.max_salary/1000)}k`;
+      }
+    }
+    if (displaySalary) badgesHTML += `<span class="badge badge-salary">${displaySalary}</span>`;
 
     // Build skills
     let skillsHTML = '';
@@ -187,7 +221,7 @@ function renderOpportunities() {
         <div>
           <h3 class="card-title">${opp.title}</h3>
           <div class="card-subtitle">
-            ${opp.company || 'Unknown Company'} 
+            ${opp.normalized_company || opp.company || 'Unknown Company'} 
             ${opp.location ? `<span class="dot">•</span> <span class="card-loc">${opp.location}</span>` : ''}
           </div>
         </div>
@@ -270,7 +304,7 @@ function renderModalContent(opp) {
           </div>
           <h1 class="detail-title">${opp.title}</h1>
           <div class="detail-company">
-            ${opp.company || 'Unknown Company'}
+            ${opp.normalized_company || opp.company || 'Unknown Company'}
             ${opp.location ? `<span>•</span> <span>${opp.location}</span>` : ''}
           </div>
         </div>
@@ -293,10 +327,10 @@ function renderModalContent(opp) {
       <div>
         <div class="sidebar-panel">
           <h3 class="panel-title">Overview</h3>
-          ${(opp.salary || opp.stipend) ? `
-            <div class="dl-group"><div class="dl-dt">Compensation</div><div class="dl-dd highlight">${opp.salary || opp.stipend}</div></div>
+          ${(opp.min_salary || opp.salary || opp.stipend) ? `
+            <div class="dl-group"><div class="dl-dt">Compensation</div><div class="dl-dd highlight">${opp.min_salary ? (opp.currency || '$') + Math.round(opp.min_salary/1000) + 'k' + (opp.max_salary && opp.max_salary !== opp.min_salary ? ' - ' + Math.round(opp.max_salary/1000) + 'k' : '') : (opp.salary || opp.stipend)}</div></div>
           ` : ''}
-          ${opp.experience_level ? `
+          ${opp.experience_level && opp.experience_level !== "Not Specified" ? `
             <div class="dl-group"><div class="dl-dt">Experience</div><div class="dl-dd">${opp.experience_level}</div></div>
           ` : ''}
           ${opp.difficulty ? `
@@ -308,6 +342,38 @@ function renderModalContent(opp) {
           <div class="dl-group"><div class="dl-dt">Source</div><div class="dl-dd">${opp.source}</div></div>
           <div class="dl-group"><div class="dl-dt">Portfolio Req.</div><div class="dl-dd">${opp.portfolio_required ? 'Yes' : 'Not stated'}</div></div>
         </div>
+        
+        <div class="sidebar-panel">
+          <h3 class="panel-title">Intelligence Scores</h3>
+          <div class="dl-group">
+            <div class="dl-dt">Quality Score</div>
+            <div class="dl-dd" style="display:flex; align-items:center; gap:8px;">
+              <div style="flex:1; background:rgba(255,255,255,0.1); height:6px; border-radius:3px; overflow:hidden;">
+                <div style="width:${opp.quality_score || 0}%; height:100%; background:${(opp.quality_score || 0) >= 80 ? '#34d399' : '#fcd34d'};"></div>
+              </div>
+              <span>${opp.quality_score || 0}</span>
+            </div>
+          </div>
+          <div class="dl-group">
+            <div class="dl-dt">Freshness Score</div>
+            <div class="dl-dd" style="display:flex; align-items:center; gap:8px;">
+              <div style="flex:1; background:rgba(255,255,255,0.1); height:6px; border-radius:3px; overflow:hidden;">
+                <div style="width:${opp.freshness_score || 0}%; height:100%; background:#60a5fa;"></div>
+              </div>
+              <span>${opp.freshness_score || 0}</span>
+            </div>
+          </div>
+          <div class="dl-group">
+            <div class="dl-dt">Source Reliability</div>
+            <div class="dl-dd" style="display:flex; align-items:center; gap:8px;">
+              <div style="flex:1; background:rgba(255,255,255,0.1); height:6px; border-radius:3px; overflow:hidden;">
+                <div style="width:${opp.source_reliability_score || 0}%; height:100%; background:#c084fc;"></div>
+              </div>
+              <span>${opp.source_reliability_score || 0}</span>
+            </div>
+          </div>
+        </div>
+
         ${aiInsightHTML}
       </div>
     </div>
