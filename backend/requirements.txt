@@ -13,6 +13,7 @@ pydantic-settings==2.2.1
 # Scraping & Data
 beautifulsoup4==4.12.3
 requests==2.31.0
+httpx==0.27.0
 playwright==1.42.0
 pandas==2.2.1
 python-jobspy>=1.1.0
