@@ -24,6 +24,9 @@ from app.scrapers.naukri import NaukriScraper
 from app.scrapers.instahyre import InstahyreScraper
 from app.scrapers.cutshort import CutShortScraper
 from app.scrapers.linkedin import LinkedInScraper
+from app.scrapers.foundit import FounditScraper
+from app.scrapers.hirist import HiristScraper
+from app.scrapers.glassdoor import GlassdoorScraper
 
 class ScrapingService:
     def __init__(self, db: Session):
@@ -34,13 +37,16 @@ class ScrapingService:
             # ── LinkedIn Dedicated (Custom Built for Max Resilience) ──────
             "linkedin": LinkedInScraper(),
             
-            # ── India-Specific ───────────────────────────────────────────
+            # ── India-Specific (Massive Enterprise & Tech) ───────────────
             "naukri": NaukriScraper(),
+            "foundit": FounditScraper(),
+            "hirist": HiristScraper(),
             "instahyre": InstahyreScraper(),
             "cutshort": CutShortScraper(),
             "internshala": IntershalaScraper(),
             
-            # ── Indeed (Global + India via JobSpy) ───────────────────────
+            # ── Global Giants (Global + India via JobSpy/Custom) ─────────
+            "glassdoor": GlassdoorScraper(),
             "jobspy": JobSpyScraper(),
             
             # ── Public APIs ─────────────────────────────────────────────
