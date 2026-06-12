@@ -83,7 +83,10 @@ function setupEventListeners() {
       elements.refreshBtn.disabled = true;
       elements.refreshBtn.querySelector('span').textContent = 'Scraping...';
 
-      const res = await fetch(`${API_BASE_URL}/opportunities/scrape`, { method: 'POST' });
+      const res = await fetch(`${API_BASE_URL}/opportunities/scrape`, { 
+        method: 'POST',
+        headers: { 'X-API-Key': 'opportunity_intelligence_admin_key_2026' }
+      });
       if (!res.ok) throw new Error('Scrape failed');
       
       elements.scrapeMessage.classList.remove('hidden');
