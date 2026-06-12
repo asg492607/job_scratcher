@@ -20,7 +20,9 @@ from app.scrapers.weworkremotely import WeWorkRemotelyScraper
 from app.scrapers.reliable_apis import RemoteOKScraper, HimalayasScraper
 from app.scrapers.startups import YCombinatorScraper
 from app.scrapers.freelance import UpworkScraper, UXJobsBoardScraper
-
+from app.scrapers.naukri import NaukriScraper
+from app.scrapers.instahyre import InstahyreScraper
+from app.scrapers.cutshort import CutShortScraper
 
 class ScrapingService:
     def __init__(self, db: Session):
@@ -28,6 +30,11 @@ class ScrapingService:
         self.classifier = OpportunityClassifier()
         self.pipeline = IntelligencePipeline()
         self.scrapers = {
+            # ── India-Specific ───────────────────────────────────────────
+            "naukri": NaukriScraper(),
+            "instahyre": InstahyreScraper(),
+            "cutshort": CutShortScraper(),
+            "internshala": IntershalaScraper(),
             # ── Public APIs ─────────────────────────────────────────────
             "remotive": RemotiveScraper(),
             "arbeitnow": ArbeitnowScraper(),
@@ -50,8 +57,6 @@ class ScrapingService:
             # "creativepool": CreativepoolScraper(), # Returns 403
             # ── Remote-First ─────────────────────────────────────────────
             # "justremote": JustRemoteScraper(), # API format changed
-            # ── India-Specific ───────────────────────────────────────────
-            "internshala": IntershalaScraper(),
             # ── Multi-Platform Aggregator ─────────────────────────────────
             "jobspy": JobSpyScraper(),
         }
