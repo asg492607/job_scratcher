@@ -35,30 +35,27 @@ class ScrapingService:
             "instahyre": InstahyreScraper(),
             "cutshort": CutShortScraper(),
             "internshala": IntershalaScraper(),
-            # ── Public APIs ─────────────────────────────────────────────
-            "remotive": RemotiveScraper(),
-            "arbeitnow": ArbeitnowScraper(),
-            # "the_muse": TheMuseScraper(), # Returns 404 landing pages
-            "remoteok": RemoteOKScraper(),
-            "himalayas": HimalayasScraper(),
-            "ycombinator": YCombinatorScraper(),
-            "uxjobsboard": UXJobsBoardScraper(),
-            # ── RSS Feeds ────────────────────────────────────────────────
-            "weworkremotely": WeWorkRemotelyScraper(),
-            "authentic_jobs": AuthenticJobsScraper(),
-            "upwork": UpworkScraper(),
-            # ── Design Community Boards ──────────────────────────────────
-            "behance": BehanceScraper(),
-            "dribbble": DribbbleScraper(),
-            "coroflot": CoroflotScraper(),
-            # "krop": KropScraper(), # Returns 404
-            "motionographer": MotionographerScraper(),
-            # "smashing_magazine": SmashingMagScraper(), # Returns 404
-            # "creativepool": CreativepoolScraper(), # Returns 403
-            # ── Remote-First ─────────────────────────────────────────────
-            # "justremote": JustRemoteScraper(), # API format changed
-            # ── Multi-Platform Aggregator ─────────────────────────────────
-            "jobspy": JobSpyScraper(),
+            
+            # NOTE: LinkedIn/Indeed via JobSpy is currently failing on Render 
+            # because LinkedIn heavily blocks cloud server IPs without residential proxies.
+            # "jobspy": JobSpyScraper(),
+            
+            # ── Public APIs (Disabled to focus on India) ─────────────────
+            # "remotive": RemotiveScraper(),
+            # "arbeitnow": ArbeitnowScraper(),
+            # "remoteok": RemoteOKScraper(),
+            # "himalayas": HimalayasScraper(),
+            # "ycombinator": YCombinatorScraper(),
+            # "uxjobsboard": UXJobsBoardScraper(),
+            # ── RSS Feeds (Disabled to focus on India) ───────────────────
+            # "weworkremotely": WeWorkRemotelyScraper(),
+            # "authentic_jobs": AuthenticJobsScraper(),
+            # "upwork": UpworkScraper(),
+            # ── Design Community Boards (Disabled) ───────────────────────
+            # "behance": BehanceScraper(),
+            # "dribbble": DribbbleScraper(),
+            # "coroflot": CoroflotScraper(),
+            # "motionographer": MotionographerScraper(),
         }
 
     def scrape_source(self, source: str = "behance") -> Dict[str, Any]:
