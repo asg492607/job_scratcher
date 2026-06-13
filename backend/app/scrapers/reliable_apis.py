@@ -6,12 +6,8 @@ from app.scrapers.common import dedupe_jobs, is_design_related, normalize_job
 class RemoteOKScraper(BaseScraper):
     """Fetches design jobs from RemoteOK public API."""
     def scrape(self) -> List[Dict[str, Any]]:
-        url = "https://remoteok.com/api?tag=design"
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
-        try:
-            with httpx.Client(headers=headers, timeout=15.0) as client:
-                response = client.get(url)
-                response.raise_for_status()
+        # RemoteOK now blocks with 403 Forbidden
+        return []
                 data = response.json()
                 
                 # RemoteOK API returns a legal/stats object as the first item in the array

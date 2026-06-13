@@ -60,17 +60,6 @@ class JobSpyScraper(BaseScraper):
             "Indore, India",
             "Kochi, India",
             "Coimbatore, India",
-            # Global (Secondary Priority)
-            "worldwide",
-            "Remote",
-            "United States",
-            "United Kingdom",
-            "Canada",
-            "Germany",
-            "Australia",
-            "Singapore",
-            "Netherlands",
-            "United Arab Emirates",
         ]
         self.results_wanted = 1000
 
