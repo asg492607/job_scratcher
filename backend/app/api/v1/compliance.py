@@ -1,6 +1,6 @@
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.database.session import get_db
@@ -10,7 +10,7 @@ router = APIRouter(prefix="/compliance", tags=["DPDP & Compliance"])
 
 class TakedownRequest(BaseModel):
     company_name: str
-    contact_email: Optional[EmailStr] = None
+    contact_email: Optional[str] = None
     domain: Optional[str] = None
     reason: Optional[str] = "Listing removal request under DPDP / Copyright policy"
 
