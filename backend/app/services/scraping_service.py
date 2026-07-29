@@ -10,9 +10,13 @@ from app.scrapers.internshala import IntershalaScraper
 from app.scrapers.naukri import NaukriScraper
 from app.scrapers.linkedin import LinkedInScraper
 
+from app.repositories.opt_out_repo import OptOutRepository
+
 class ScrapingService:
     def __init__(self, db: Session):
+        self.db = db
         self.repo = OpportunityRepository(db)
+        self.opt_out_repo = OptOutRepository(db)
         self.classifier = OpportunityClassifier()
         self.pipeline = IntelligencePipeline()
         self.scrapers = {
@@ -38,6 +42,12 @@ class ScrapingService:
         for raw_item in raw_items:
             try:
                 normalized = scraper.normalize(raw_item)
+                
+                # Check opt-out blocklist under DPDP compliance policy
+                if self.opt_out_repo.is_company_blocked(normalized.get("company")):
+                    print(f"[ScrapingService] Skipping opted-out company: {normalized.get('company')}")
+                    continue
+
                 enhanced_job = self.pipeline.process_job(normalized)
                 skills = self.classifier.classify_skills(enhanced_job.get("description", ""))
                 enhanced_job["skills"] = list(skills)
@@ -86,6 +96,12 @@ class ScrapingService:
                 for raw_item in raw_items:
                     try:
                         normalized = scraper.normalize(raw_item)
+
+                        # Check opt-out blocklist under DPDP compliance policy
+                        if self.opt_out_repo.is_company_blocked(normalized.get("company")):
+                            print(f"[ScrapingService] Skipping opted-out company: {normalized.get('company')}")
+                            continue
+
                         enhanced_job = self.pipeline.process_job(normalized)
                         skills = self.classifier.classify_skills(enhanced_job.get("description", ""))
                         enhanced_job["skills"] = list(skills)
@@ -114,4 +130,5 @@ class ScrapingService:
             "created": sum(r.get("created", 0) for r in results),
             "updated": sum(r.get("updated", 0) for r in results),
         }
+
 

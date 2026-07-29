@@ -117,11 +117,18 @@ def dedupe_jobs(jobs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     return unique_jobs
 
 
+from app.utils.sanitizer import PIISanitizer
+
+
 def normalize_job(raw_data: Dict[str, Any], source: str) -> Dict[str, Any]:
+    raw_title = PIISanitizer.sanitize_text(raw_data.get("raw_title"))
+    raw_description = PIISanitizer.sanitize_text(raw_data.get("job_description"))
+    company = PIISanitizer.sanitize_text(raw_data.get("company_name"))
+
     return {
-        "title": raw_data.get("raw_title"),
-        "company": raw_data.get("company_name"),
-        "description": raw_data.get("job_description"),
+        "title": raw_title,
+        "company": company,
+        "description": raw_description,
         "location": raw_data.get("job_location"),
         "remote_status": infer_remote_status(raw_data.get("job_location")),
         "salary": raw_data.get("salary"),
@@ -130,4 +137,5 @@ def normalize_job(raw_data: Dict[str, Any], source: str) -> Dict[str, Any]:
         "is_active": True,
         "created_at": datetime.utcnow(),
     }
+
 

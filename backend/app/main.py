@@ -20,6 +20,7 @@ from fastapi.staticfiles import StaticFiles
 try:
     from app.api.v1.opportunities import router as opportunities_router
     from app.api.v1.stats import router as stats_router
+    from app.api.v1.compliance import router as compliance_router
     from app.database.session import SessionLocal, engine
     from app.database.base import Base
     from app.services.scraping_service import ScrapingService
@@ -27,6 +28,7 @@ try:
 except ImportError:
     from .api.v1.opportunities import router as opportunities_router
     from .api.v1.stats import router as stats_router
+    from .api.v1.compliance import router as compliance_router
     from .database.session import SessionLocal, engine
     from .database.base import Base
     from .services.scraping_service import ScrapingService
@@ -82,6 +84,8 @@ app.add_middleware(
 
 app.include_router(opportunities_router, prefix="/api/v1")
 app.include_router(stats_router, prefix="/api/v1")
+app.include_router(compliance_router, prefix="/api/v1")
+
 
 
 @app.get("/health")
