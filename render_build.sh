@@ -1,10 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# exit on error
+set -o errexit
 
-# Upgrade pip
+cd backend
 pip install --upgrade pip
-
-# Install dependencies
 pip install -r requirements.txt
 
-# Install Playwright browser engine for Stealth Mode
+# Set Playwright browser path locally to avoid system permission issues on Render
+export PLAYWRIGHT_BROWSERS_PATH=0
 python -m playwright install chromium
