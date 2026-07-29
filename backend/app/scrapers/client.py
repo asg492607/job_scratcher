@@ -79,7 +79,9 @@ class RobustHttpClient:
         last_response = None
         
         for attempt in range(self.max_retries):
-            proxy_url = ProxyManager.get_proxy()
+            # Try proxies for initial attempts, fall back to direct connection on final attempt
+            use_proxy = attempt < (self.max_retries - 1)
+            proxy_url = ProxyManager.get_proxy() if use_proxy else None
             proxies = {"http://": proxy_url, "https://": proxy_url} if proxy_url else None
             
             try:
@@ -120,6 +122,7 @@ class RobustHttpClient:
         if last_response is not None:
             return last_response
         raise Exception(f"[RobustHttpClient] All {self.max_retries} attempts failed due to dead proxies or network errors.")
+
 
     def close(self):
         pass
