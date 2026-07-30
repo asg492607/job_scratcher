@@ -113,6 +113,8 @@ class ScrapingService:
         # 1. Fetch raw items concurrently (Network IO Bound)
         def fetch_raw(source_name: str):
             scraper = self.scrapers.get(source_name)
+            if not scraper:
+                return source_name, [], "Scraper instance not found"
             try:
                 raw_items = scraper.scrape()
                 return source_name, raw_items, None
