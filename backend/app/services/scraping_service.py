@@ -6,9 +6,27 @@ from app.categorization.classifier import OpportunityClassifier
 from app.intelligence.pipeline import IntelligencePipeline
 from app.repositories.opportunity_repo import OpportunityRepository
 from app.schemas.opportunity import OpportunityCreate
-from app.scrapers.internshala import IntershalaScraper
+from app.scrapers.internshala import InternshalaScraper
 from app.scrapers.naukri import NaukriScraper
 from app.scrapers.linkedin import LinkedInScraper
+from app.scrapers.arbeitnow import ArbeitnowScraper
+from app.scrapers.authentic_coroflot import AuthenticJobsScraper, CoroflotScraper
+from app.scrapers.behance import BehanceScraper
+from app.scrapers.cutshort import CutShortScraper
+from app.scrapers.dribbble import DribbbleScraper
+from app.scrapers.foundit import FounditScraper
+from app.scrapers.freelance import UpworkScraper, UXJobsBoardScraper
+from app.scrapers.glassdoor import GlassdoorScraper
+from app.scrapers.hirist import HiristScraper
+from app.scrapers.instahyre import InstahyreScraper
+from app.scrapers.jobspy_scraper import JobSpyScraper
+from app.scrapers.justremote_creative import JustRemoteScraper, CreativepoolScraper, SmashingMagScraper
+from app.scrapers.krop_motionographer import MotionographerScraper, KropScraper
+from app.scrapers.reliable_apis import RemoteOKScraper, HimalayasScraper
+from app.scrapers.remotive import RemotiveScraper
+from app.scrapers.startups import YCombinatorScraper
+from app.scrapers.the_muse import TheMuseScraper
+from app.scrapers.weworkremotely import WeWorkRemotelyScraper
 
 from app.repositories.opt_out_repo import OptOutRepository
 
@@ -22,7 +40,31 @@ class ScrapingService:
         self.scrapers = {
             "linkedin": LinkedInScraper(),
             "naukri": NaukriScraper(),
-            "internshala": IntershalaScraper(),
+            "internshala": InternshalaScraper(),
+            "arbeitnow": ArbeitnowScraper(),
+            "authentic_jobs": AuthenticJobsScraper(),
+            "coroflot": CoroflotScraper(),
+            "behance": BehanceScraper(),
+            "cutshort": CutShortScraper(),
+            "dribbble": DribbbleScraper(),
+            "foundit": FounditScraper(),
+            "upwork": UpworkScraper(),
+            "uxjobsboard": UXJobsBoardScraper(),
+            "glassdoor": GlassdoorScraper(),
+            "hirist": HiristScraper(),
+            "instahyre": InstahyreScraper(),
+            "jobspy": JobSpyScraper(),
+            "justremote": JustRemoteScraper(),
+            "creativepool": CreativepoolScraper(),
+            "smashingmag": SmashingMagScraper(),
+            "motionographer": MotionographerScraper(),
+            "krop": KropScraper(),
+            "remoteok": RemoteOKScraper(),
+            "himalayas": HimalayasScraper(),
+            "remotive": RemotiveScraper(),
+            "ycombinator": YCombinatorScraper(),
+            "the_muse": TheMuseScraper(),
+            "weworkremotely": WeWorkRemotelyScraper(),
         }
 
     def scrape_source(self, source: str = "linkedin") -> Dict[str, Any]:
@@ -78,8 +120,8 @@ class ScrapingService:
                 return source_name, [], str(e)
 
         results = []
-        # Use 3 threads to fetch from all 3 platforms simultaneously
-        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+        # Use concurrent threads to fetch from all platforms simultaneously
+        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
             future_to_source = {executor.submit(fetch_raw, src): src for src in self.scrapers}
             for future in concurrent.futures.as_completed(future_to_source):
                 source_name, raw_items, error = future.result()

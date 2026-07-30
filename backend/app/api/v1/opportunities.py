@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, Security
+import os
+from fastapi import APIRouter, Depends, HTTPException, Security, Query
 from fastapi.security.api_key import APIKeyHeader
 from sqlalchemy.orm import Session
 from typing import List, Optional
@@ -13,10 +14,10 @@ router = APIRouter(prefix="/opportunities", tags=["opportunities"])
 API_KEY_NAME = "X-API-Key"
 api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=True)
 
-# Basic API Key validation
+# API Key validation against env or fallback default
 def get_api_key(api_key_header: str = Security(api_key_header)):
-    # In a real production app, check against environment variable or DB
-    if api_key_header == "opportunity_intelligence_admin_key_2026":
+    expected_key = os.getenv("ADMIN_API_KEY", "opportunity_intelligence_admin_key_2026")
+    if api_key_header == expected_key:
         return api_key_header
     raise HTTPException(status_code=403, detail="Could not validate credentials")
 
@@ -32,10 +33,10 @@ def get_opportunities(
     limit: int = 20000,
     search: Optional[str] = None,
     company: Optional[str] = None,
-    category: Optional[List[str]] = None,
-    remote_status: Optional[List[str]] = None,
-    domain: Optional[List[str]] = None,
-    difficulty: Optional[List[str]] = None,
+    category: Optional[List[str]] = Query(None),
+    remote_status: Optional[List[str]] = Query(None),
+    domain: Optional[List[str]] = Query(None),
+    difficulty: Optional[List[str]] = Query(None),
     portfolio_required: Optional[bool] = None,
     repo: OpportunityRepository = Depends(get_repo),
 ):
@@ -52,6 +53,7 @@ def get_opportunities(
     )
 
 @router.post("/scrape")
+@router.post("/scrape/all")
 def scrape_opportunities(
     service: ScrapingService = Depends(get_scraping_service),
     api_key: str = Security(get_api_key)
@@ -64,6 +66,8 @@ def scrape_source(
     service: ScrapingService = Depends(get_scraping_service),
     api_key: str = Security(get_api_key)
 ):
+    if source == "all":
+        return service.scrape_all()
     return service.scrape_source(source)
 
 @router.get("/{opp_id}", response_model=OpportunityResponse)

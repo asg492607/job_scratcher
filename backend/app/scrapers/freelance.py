@@ -8,12 +8,13 @@ from app.scrapers.common import dedupe_jobs, is_design_related, normalize_job
 class UpworkScraper(BaseScraper):
     """Fetches freelance design jobs from Upwork's RSS feed."""
     def scrape(self) -> List[Dict[str, Any]]:
-        # Upwork RSS feed is no longer public (410 Gone)
-        return []        
+        rss_url = "https://www.upwork.com/ab/feed/jobs/rss?q=design"
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
         try:
-            with httpx.Client(headers=headers, timeout=15.0) as client:
+            with httpx.Client(headers=headers, timeout=15.0, follow_redirects=True) as client:
                 response = client.get(rss_url)
-                response.raise_for_status()
+                if response.status_code != 200:
+                    return []
                 
                 root = ET.fromstring(response.text)
                 results = []

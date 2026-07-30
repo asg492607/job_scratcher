@@ -85,3 +85,8 @@ class IntershalaScraper(ResilientScraperMixin, BaseScraper):
         normalized["salary"] = None
         return normalized
 
+
+# Alias with correct spelling
+InternshalaScraper = IntershalaScraper
+
+
